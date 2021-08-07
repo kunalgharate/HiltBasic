@@ -13,6 +13,7 @@ import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.internal.managers.ApplicationComponentManager
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @AndroidEntryPoint
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         //Interface example
 
         Log.d("MyTestClass", "onCreate: " + someClass.doThing())
+        Log.d("MyTestClass", "onCreate2: " + someClass.doThing2())
     }
 }
 
@@ -65,9 +67,13 @@ class SomeOtherClass
 
 class SomeClass
 @Inject
-constructor(private val someInterfaceImpl: SomeInterface) {
+constructor(@Impl1 private val someInterfaceImpl: SomeInterface,
+            @Impl2 private val someInterfaceImpl2: SomeInterface) {
     fun doThing(): String {
         return " Hilt test ! ${someInterfaceImpl.printString()}"
+    }
+    fun doThing2(): String {
+        return " Hilt test  2! ${someInterfaceImpl2.printString()}"
     }
 }
 
@@ -88,11 +94,28 @@ abstract  class  MyModule {
 @InstallIn(SingletonComponent::class)
 @Module
 class MyModule {
+
+    @Impl1
     @Singleton
     @Provides
     fun provideSomeInterface() :SomeInterface{
         return  SomeInterfaceImpl()
     }
+
+    @Impl2
+    @Singleton
+    @Provides
+    fun provideSomeInterface2() :SomeInterface{
+        return  SomeInterfaceImpl2()
+    }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Impl1
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Impl2
 
 
